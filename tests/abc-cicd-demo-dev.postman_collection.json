@@ -1,0 +1,49 @@
+{
+	"info": {
+		"_postman_id": "94e56914-e5f2-4380-bb53-4c3aa294cbab",
+		"name": "abc-cicd-demo-dev",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "sayhello",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Response time is less than 2000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+							"});\r",
+							"pm.test(\"Status code name has string\", function () {\r",
+							"    pm.response.to.have.status(\"OK\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://abc-cicd-demo-dev.us-e2.cloudhub.io/hello",
+					"protocol": "http",
+					"host": [
+						"abc-cicd-demo-dev",
+						"us-e2",
+						"cloudhub",
+						"io"
+					],
+					"path": [
+						"hello"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

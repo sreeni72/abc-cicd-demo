@@ -1,0 +1,17 @@
+{
+  "name": "postman-newman-jenkins",
+  "version": "1.0.0",
+  "description": "Project for store postman collection",
+  "scripts": {
+    "app-tests-dev": "C:\\Users\\Administrator\\AppData\\Roaming\\npm\\newman run tests/abc-cicd-demo-dev.postman_collection.json --disable-unicode --reporters cli,junit --reporter-junit-export newman.xml --insecure",
+    "app-tests-test": "C:\\Users\\Administrator\\AppData\\Roaming\\npm\\newman run tests/abc-cicd-demo-test.postman_collection.json --disable-unicode --reporters cli,junit --reporter-junit-export newman.xml --insecure",
+    "app-tests-stage": "C:\\Users\\Administrator\\AppData\\Roaming\\npm\\newman run tests/abc-cicd-demo-stage.postman_collection.json --disable-unicode --reporters cli,junit --reporter-junit-export newman.xml --insecure",
+    "app-tests-cert": "C:\\Users\\Administrator\\AppData\\Roaming\\npm\\newman run tests/abc-cicd-demo-cert.postman_collection.json --disable-unicode --reporters cli,junit --reporter-junit-export newman.xml --insecure",
+    "app-tests-prod": "C:\\Users\\Administrator\\AppData\\Roaming\\npm\\newman run tests/abc-cicd-demo-prod.postman_collection.json --disable-unicode --reporters cli,junit --reporter-junit-export newman.xml --insecure"
+  },
+  "author": "Test Author",
+  "dependencies": {
+    "newman": "^5.3.0",
+    "newman-reporter-htmlextra": "^1.22.1"
+  }
+}

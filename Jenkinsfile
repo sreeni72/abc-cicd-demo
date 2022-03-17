@@ -83,7 +83,7 @@ pipeline {
 					}						
 				}
 				echo "Deploying to CLOUDHUB Starting....."
-				bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=${t_workerType} -Dworkers=${t_workers} -Denvironment=${t_environment}'
+				bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType="${t_workerType}" -Dworkers="${t_workers}" -Denvironment="${t_environment}"'
 				echo "Deploying to CLOUDHUB Completed....." 
 			}
 		}

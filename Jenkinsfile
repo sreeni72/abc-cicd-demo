@@ -54,36 +54,19 @@ pipeline {
 		}
 		stage('Deploy to CLOUDHUB'){
 			steps{
-				script{
-					
-					if(env.BRANCH_NAME == "develop") {
-						t_environment = "dev"
-						t_workerType = "Micro"
-						t_workers = 1						
-					}
-					if(env.TARGET_ENV == "test") {
-						t_environment = "test"
-						t_workerType = "Micro"
-						t_workers = 1						
-					}
-					if(env.TARGET_ENV == "stage") {
-						t_environment = "stage"
-						t_workerType = "Micro"
-						t_workers = 1						
-					}
-					if(env.TARGET_ENV == "cert") {
-						t_environment = "cert"
-						t_workerType = "Micro"
-						t_workers = 1						
-					}
-					if(env.TARGET_ENV == "prod") {
-						t_environment = "prod"
-						t_workerType = "Micro"
-						t_workers = 1						
-					}						
-				}
 				echo "Deploying to CLOUDHUB Starting....."
-				bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType="${t_workerType}" -Dworkers="${t_workers}" -Denvironment="${t_environment}"'
+				script{
+					if(env.BRANCH_NAME == "develop") 
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=dev'
+					if(env.TARGET_ENV == "test")
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=test'
+					if(env.TARGET_ENV == "stage") 
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=stage'
+					if(env.TARGET_ENV == "cert") 
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=cert'
+					if(env.TARGET_ENV == "prod")
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=prod'				
+				}
 				echo "Deploying to CLOUDHUB Completed....." 
 			}
 		}

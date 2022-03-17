@@ -25,7 +25,6 @@ pipeline {
 		stage('Build Application') {
 			
 			steps {
-				echo 'Build the Mule Application...' 
 				bat 'mvn clean package'
 			}
 		}
@@ -37,37 +36,26 @@ pipeline {
 		stage('Publish to Exchange'){
 			steps{
 				script{
-					if(env.BRANCH_NAME == "develop") {
-						echo "Publishing to Exchange Starting....."
-						try{
-							bat 'mvn clean deploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -s settings.xml'
-							currentBuild.result = 'SUCCESS'
-							echo "Publishing to Exchange Completed....."
-						}
-						catch(Exception e){
-							currentBuild.result = 'FAILURE'
-							echo "Publishing to Exchange Failed, Artifact already Exits....."
-						}						
-					}
+					if(env.BRANCH_NAME == "develop") 
+						bat 'mvn clean deploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -s settings.xml'												
 				}
 			}
 		}
 		stage('Deploy to CLOUDHUB'){
 			steps{
-				echo "Deploying to CLOUDHUB Starting....."
 				script{
 					if(env.BRANCH_NAME == "develop") 
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=dev'
-					if(env.TARGET_ENV == "test")
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=test'
-					if(env.TARGET_ENV == "stage") 
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=stage'
-					if(env.TARGET_ENV == "cert") 
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=cert'
-					if(env.TARGET_ENV == "prod")
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=prod'				
-				}
-				echo "Deploying to CLOUDHUB Completed....." 
+					 withEnv(['TARGET_ENV=dev', 'WORKER_TYPE=Micro', 'WORKERS=1'])
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test")
+					 withEnv(['TARGET_ENV=test', 'WORKER_TYPE=Micro', 'WORKERS=1'])
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage")
+					 withEnv(['TARGET_ENV=stage', 'WORKER_TYPE=Micro', 'WORKERS=1'])
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert")
+                     withEnv(['TARGET_ENV=cert', 'WORKER_TYPE=Micro', 'WORKERS=1'])				
+					if(env.BRANCH_NAME == "master") 
+					 withEnv(['TARGET_ENV=prod', 'WORKER_TYPE=Micro', 'WORKERS=1']) 
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=${WORKER_TYPE} -Dworkers=${WORKERS} -Denvironment=${TARGET_ENV}'	 				
+				}				
 			}
 		}
 		stage("Perform Regression Test"){
@@ -96,5 +84,5 @@ pipeline {
 		failure {
 			cleanWs deleteDirs: true, notFailBuild: true
 		}
-	}
+	} 
 }	

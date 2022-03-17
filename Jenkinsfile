@@ -6,18 +6,18 @@ pipeline {
 		// NEXUS_CRED = credentials('nexus.credentials')
 		TARGET_ENV = "${Target}"
 		BRANCH_NAME = "${GIT_BRANCH.split("/")[1]}"
-		group_id = readMavenPom().getGroupId()
-		artifact_id = readMavenPom().getArtifactId()
-		version = readMavenPom().getVersion()
-		art_name = readMavenPom().getName()
-		report_file = "${WORKSPACE}/index.html"
+		//group_id = readMavenPom().getGroupId()
+		//artifact_id = readMavenPom().getArtifactId()
+		//version = readMavenPom().getVersion()
+		//art_name = readMavenPom().getName()
+		//report_file = "${WORKSPACE}/index.html"
 			   	    
 	    BUILD_NUMBER = currentBuild.getNumber()
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
         NEXUS_URL = "localhost:8081"
         NEXUS_REPOSITORY = "maven-snapshots"
-        NEXUS_CREDENTIAL_ID = "nexus.credentials"
+        
         
     }
 	

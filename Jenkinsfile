@@ -44,23 +44,36 @@ pipeline {
 		stage('Deploy to CLOUDHUB'){
 			steps{
 				script{
-					if(env.BRANCH_NAME == "develop") 
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=dev'
-					 
-					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test")
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=test'
-					
-					 
-					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage")
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=stage'
-					
-					 
-					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert")
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=cert'
-                    			
-					if(env.BRANCH_NAME == "master") 
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=prod' 				
-				}				
+					def WORKER_TYPE
+					def WORKERS
+					def T_ENV
+					if(env.BRANCH_NAME == "develop") {
+						T_ENV="dev"
+						WORKER_TYPE="Micro"
+						WORKERS=1						
+					}					 
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test"){
+						TARGET_ENV="test"
+						WORKER_TYPE="Micro"
+						WORKERS=1						
+					}					 
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage"){
+						T_ENV="stage"
+						WORKER_TYPE="Micro"
+						WORKERS=1
+					}					 
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert"){
+						T_ENV="cert"
+						WORKER_TYPE="Micro"
+						WORKERS=1
+					}                   			
+					if(env.BRANCH_NAME == "master") {
+						T_ENV="prod"
+						WORKER_TYPE="Micro"
+						WORKERS=1
+					}					
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=${WORKER_TYPE} -Dworkers=${WORKERS} -Denvironment=${T_ENV}'	 				
+				}			
 			}
 		}
 		stage("Perform Regression Test"){

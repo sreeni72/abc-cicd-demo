@@ -15,7 +15,7 @@ pipeline {
     	}
 	stage('Publish to Exchange'){
 		environment {
-			ANYPOINT_CREDENTIALS = credentials('anypoint.credentials')
+			ANYPOINT_CREDENTIALS = credentials('mule.credentials')
 		}
 		steps{
 			echo "Publishing to Exchange Starting....."
@@ -25,7 +25,7 @@ pipeline {
 	}
 	stage('Deploy to CLOUDHUB'){
 		environment {
-			ANYPOINT_CREDENTIALS = credentials('anypoint.credentials')
+			ANYPOINT_CREDENTIALS = credentials('mule.credentials')
 		}
 		steps{
 			echo "Deploying to CLOUDHUB Starting....."

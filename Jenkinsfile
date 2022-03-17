@@ -28,7 +28,7 @@ pipeline {
 		steps{
 			echo "Deploying to CLOUDHUB Starting....."
 			echo "Publishing to Exchange Completed.....${anypoint_user}, ${anypoint_pwd} "
-			bat 'mvn clean deploy -DmuleDeploy -Dusername=${anypoint_user} -Dpassword=${anypoint_pwd} -DworkerType=Micro -Dworkers=1 -Denvironment=dev -Dmule.version=4.4.0'
+			bat 'mvn clean deploy -DmuleDeploy -Dusername="%anypoint_user%" -Dpassword="%anypoint_pwd%" -DworkerType=Micro -Dworkers=1 -Denvironment=dev -Dmule.version=4.4.0'
     	    		echo "Deploying to CLOUDHUB Completed....."
 		}
 	}

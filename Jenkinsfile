@@ -25,7 +25,6 @@ pipeline {
 		stage('Build Application') {
 			
 			steps {
-				echo 'Build the Mule Application...' 
 				bat 'mvn clean package'
 			}
 		}
@@ -37,37 +36,27 @@ pipeline {
 		stage('Publish to Exchange'){
 			steps{
 				script{
-					if(env.BRANCH_NAME == "develop") {
-						echo "Publishing to Exchange Starting....."
-						try{
-							bat 'mvn clean deploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -s settings.xml'
-							currentBuild.result = 'SUCCESS'
-							echo "Publishing to Exchange Completed....."
-						}
-						catch(Exception e){
-							currentBuild.result = 'FAILURE'
-							echo "Publishing to Exchange Failed, Artifact already Exits....."
-						}						
-					}
+					if(env.BRANCH_NAME == "develop") 
+						bat 'mvn clean deploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -s settings.xml'												
 				}
 			}
 		}
 		stage('Deploy to CLOUDHUB'){
 			steps{
-				echo "Deploying to CLOUDHUB Starting....."
 				script{
 					if(env.BRANCH_NAME == "develop") 
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=dev'
+					 withEnv(['T_ENV=dev'])
 					if(env.TARGET_ENV == "test")
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=test'
-					if(env.TARGET_ENV == "stage") 
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=stage'
-					if(env.TARGET_ENV == "cert") 
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=cert'
+					 withEnv(['T_ENV=test'])
+					if(env.TARGET_ENV == "stage")
+					 withEnv(['T_ENV=stage'])
+					if(env.TARGET_ENV == "cert")
+                                          withEnv(['T_ENV=cert'])					
 					if(env.TARGET_ENV == "prod")
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=prod'				
-				}
-				echo "Deploying to CLOUDHUB Completed....." 
+					 withEnv(['T_ENV=prod'])
+					 
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=${T_ENV}'	 				
+				}				
 			}
 		}
 		stage("Perform Regression Test"){

@@ -85,5 +85,16 @@ pipeline {
 				}                
 			}
 		}
-    }
+    stage ('Clean Workspace') {
+			steps {
+				cleanWs deleteDirs: true, notFailBuild: true
+			}
+		}								
+	}
+	
+	post {
+		failure {
+			cleanWs deleteDirs: true, notFailBuild: true
+		}
+	}
 }	

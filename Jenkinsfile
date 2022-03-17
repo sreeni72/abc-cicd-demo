@@ -3,7 +3,7 @@ pipeline {
      
 	environment {
 		MULE_CRED = credentials('mule.credentials')
-		NEXUS_CRED = credentials('nexus.credentials')
+		// NEXUS_CRED = credentials('nexus.credentials')
 		TARGET_ENV = "${Target}"
 		BRANCH_NAME = "${GIT_BRANCH.split("/")[1]}"
 		group_id = readMavenPom().getGroupId()
@@ -23,8 +23,8 @@ pipeline {
 	
     stages {
 		stage('Build Application') {
+			
 			steps {
-				
 				echo 'Build the Mule Application...' 
 				bat 'mvn clean package'
 			}
@@ -55,33 +55,33 @@ pipeline {
 		stage('Deploy to CLOUDHUB'){
 			steps{
 				script{
-				echo "Set Variables for ${brance_name}......"
-				if(env.BRANCH_NAME == "develop") {
-					environment = "dev"
-					workerType = "Micro"
-					workers = 1						
+					echo "Set Variables for ${brance_name}......"
+					if(env.BRANCH_NAME == "develop") {
+						environment = "dev"
+						workerType = "Micro"
+						workers = 1						
+					}
+					if(env.TARGET_ENV == "test") {
+						environment = "test"
+						workerType = "Micro"
+						workers = 1						
+					}
+					if(env.TARGET_ENV == "stage") {
+						environment = "stage"
+						workerType = "Micro"
+						workers = 1						
+					}
+					if(env.TARGET_ENV == "cert") {
+						environment = "cert"
+						workerType = "Micro"
+						workers = 1						
+					}
+					if(env.TARGET_ENV == "prod") {
+						environment = "prod"
+						workerType = "Micro"
+						workers = 1						
+					}						
 				}
-				if(env.TARGET_ENV == "test") {
-					environment = "test"
-					workerType = "Micro"
-					workers = 1						
-				}
-				if(env.TARGET_ENV == "stage") {
-					environment = "stage"
-					workerType = "Micro"
-					workers = 1						
-				}
-				if(env.TARGET_ENV == "cert") {
-					environment = "cert"
-					workerType = "Micro"
-					workers = 1						
-				}
-				if(env.TARGET_ENV == "prod") {
-					environment = "prod"
-					workerType = "Micro"
-					workers = 1						
-				}						
-			}
 				echo "Deploying to CLOUDHUB Starting....."
 				bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=${DworkerType} -Dworkers=${workers} -Denvironment=${environment}'
 				echo "Deploying to CLOUDHUB Completed....." 

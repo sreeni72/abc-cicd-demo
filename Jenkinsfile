@@ -8,6 +8,11 @@ pipeline {
 			bat 'mvn clean package'
 		}
 	}
+	stage("Perfrom MUnit Test"){
+    		steps{
+    			bat 'mvn clean test -X'
+    		}
+    	}
 	stage('Publish to Exchange'){
 		steps{
 			echo "Publishing to Exchange Starting....."
@@ -20,7 +25,7 @@ pipeline {
 	stage('Deploy to CLOUDHUB'){
 		steps{
 			echo "Deploying to CLOUDHUB Starting....."
-			bat 'mvn clean deploy -DmuleDeploy -Dusername=muser13 -Dpassword=Lakshmi@1 -DworkerType=Micro -Dworkers=1 -Denvironment=dev -Dmule.version=4.4.0'
+			bat 'mvn clean deploy -DmuleDeploy -Dusername=${anypoint_user} -Dpassword=${anypoint_pwd} -DworkerType=Micro -Dworkers=1 -Denvironment=dev -Dmule.version=4.4.0'
     	    		echo "Deploying to CLOUDHUB Completed....."
 		}
 	}

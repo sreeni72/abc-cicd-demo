@@ -1,12 +1,7 @@
 pipeline {
     agent any
     
-	parameters{
-	    string CURRENT_BUILD_RESULT = "SUCCESS"
-		string(name: "RELEASE_VERSION",description: "current deploy version", defalutValue: "0.0.1-SNAPSHOT")
-		booleanParam(name: "CURRENT_BUILD_DEPLOY", defaultValue: false, description: "Deploy application to RTF")
-	}
-	
+		
     environment {
 	
 		mule_cred = credentials(' ')
@@ -37,7 +32,7 @@ pipeline {
 		}
 		
 		stage('Publish to Exchange'){
-			when{ expression { params.CURRENT_BUILD_DEPLOY } }
+			
 			steps{
 				echo "Publishing to Exchange Starting....."
 				withCredentials([usernamePassword(credentialsId: 'mule.credentials', passwordVariable: 'anypoint_pwd', usernameVariable: 'anypoint_user')]) {
@@ -45,14 +40,11 @@ pipeline {
     	    			}
 				echo "Publishing to Exchange Completed....."
 			}
-			post{
-				success{ echo "Publish to Exchange - Successful" }
-				failure{ echo "Publish to Exchange - Failure" }
-			}
+			
 		}
 		
 		stage('Deploy to CLOUDHUB'){
-			when{ expression { params.CURRENT_BUILD_DEPLOY } }
+			
 			steps{
 				echo "Deploying to CLOUDHUB Starting....."
 				withCredentials([usernamePassword(credentialsId: 'mule.credentials', passwordVariable: 'anypoint_pwd', usernameVariable: 'anypoint_user')]) {
@@ -60,10 +52,7 @@ pipeline {
     	    	}
 				echo "Deploying to CLOUDHUB Completed....."
 			}
-			post{
-				success{ echo "Deploy to CLOUDHUB - Successful" }
-				failure{ echo "Deploy to CLOUDHUB - Failure" }
-			}
+			
 		}
 		
 		stage("Run unit tests"){

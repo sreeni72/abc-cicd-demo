@@ -17,7 +17,7 @@ pipeline {
         NEXUS_PROTOCOL = "http"
         NEXUS_URL = "localhost:8081"
         NEXUS_REPOSITORY = "maven-snapshots"
-        
+         
         
     }
 	
@@ -44,16 +44,47 @@ pipeline {
 		stage('Deploy to CLOUDHUB'){
 			steps{
 				script{
-					if(env.BRANCH_NAME == "develop") 
-					 withEnv(['TARGET_ENV=dev', 'WORKER_TYPE=Micro', 'WORKERS=1'])
-					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test")
-					 withEnv(['TARGET_ENV=test', 'WORKER_TYPE=Micro', 'WORKERS=1'])
-					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage")
-					 withEnv(['TARGET_ENV=stage', 'WORKER_TYPE=Micro', 'WORKERS=1'])
-					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert")
-                     withEnv(['TARGET_ENV=cert', 'WORKER_TYPE=Micro', 'WORKERS=1'])				
-					if(env.BRANCH_NAME == "master") 
-					 withEnv(['TARGET_ENV=prod', 'WORKER_TYPE=Micro', 'WORKERS=1']) 
+					if(env.BRANCH_NAME == "develop") {
+						environment{
+							TARGET_ENV="dev"
+							WORKER_TYPE="Micro"
+							WORKERS=1					
+						}
+					}
+					 
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test"){
+						environment{
+							TARGET_ENV="test"
+							WORKER_TYPE="Micro"
+							WORKERS=1					
+						}
+					}
+					
+					 
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage"){
+						environment{
+							TARGET_ENV="stage"
+							WORKER_TYPE="Micro"
+							WORKERS=1					
+						}
+					}
+					
+					 
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert"){
+						environment{
+							TARGET_ENV="cert"
+							WORKER_TYPE="Micro"
+							WORKERS=1					
+						}
+					}
+                    			
+					if(env.BRANCH_NAME == "master") {
+						environment{
+							TARGET_ENV="prod"
+							WORKER_TYPE="Micro"
+							WORKERS=1					
+						}
+					}
 					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=${WORKER_TYPE} -Dworkers=${WORKERS} -Denvironment=${TARGET_ENV}'	 				
 				}				
 			}

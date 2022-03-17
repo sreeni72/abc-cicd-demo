@@ -90,9 +90,10 @@ pipeline {
 		stage('Publish to Exchange'){
 			when{ expression { params.CURRENT_BUILD_DEPLOY } }
 			steps{
-				echo "Publishing to Exchange Starting....."withCredentials([usernamePassword(credentialsId: 'mule.credentials', passwordVariable: 'anypoint_pwd', usernameVariable: 'anypoint_user')]) {
+				echo "Publishing to Exchange Starting....."
+				withCredentials([usernamePassword(credentialsId: 'mule.credentials', passwordVariable: 'anypoint_pwd', usernameVariable: 'anypoint_user')]) {
     				bat 'mvn clean deploy -Dusername=${anypoint_user} -Dpassword=${anypoint_pwd} -s settings.xml'
-    	    	}
+    	    			}
 				echo "Publishing to Exchange Completed....."
 			}
 			post{

@@ -55,7 +55,7 @@ pipeline {
 		stage('Deploy to CLOUDHUB'){
 			steps{
 				script{
-					echo "Set Variables for ${brance_name}......"
+					
 					if(env.BRANCH_NAME == "develop") {
 						environment = "dev"
 						workerType = "Micro"

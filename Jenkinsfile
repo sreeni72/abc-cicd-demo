@@ -45,17 +45,16 @@ pipeline {
 			steps{
 				script{
 					if(env.BRANCH_NAME == "develop") 
-					 withEnv(['T_ENV=dev'])
-					if(env.TARGET_ENV == "test")
-					 withEnv(['T_ENV=test'])
-					if(env.TARGET_ENV == "stage")
-					 withEnv(['T_ENV=stage'])
-					if(env.TARGET_ENV == "cert")
-                                          withEnv(['T_ENV=cert'])					
-					if(env.TARGET_ENV == "prod")
-					 withEnv(['T_ENV=prod'])
-					 
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=${T_ENV}'	 				
+					 withEnv(['TARGET_ENV=dev', 'WORKER_TYPE=Micro', 'WORKERS=1'])
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test")
+					 withEnv(['TARGET_ENV=test', 'WORKER_TYPE=Micro', 'WORKERS=1'])
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage")
+					 withEnv(['TARGET_ENV=stage', 'WORKER_TYPE=Micro', 'WORKERS=1'])
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert")
+                     withEnv(['TARGET_ENV=cert', 'WORKER_TYPE=Micro', 'WORKERS=1'])				
+					if(env.BRANCH_NAME == "master") 
+					 withEnv(['TARGET_ENV=prod', 'WORKER_TYPE=Micro', 'WORKERS=1']) 
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=${WORKER_TYPE} -Dworkers=${WORKERS} -Denvironment=${TARGET_ENV}'	 				
 				}				
 			}
 		}
@@ -85,5 +84,5 @@ pipeline {
 		failure {
 			cleanWs deleteDirs: true, notFailBuild: true
 		}
-	}
+	} 
 }	

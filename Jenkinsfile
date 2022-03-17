@@ -57,33 +57,33 @@ pipeline {
 				script{
 					
 					if(env.BRANCH_NAME == "develop") {
-						environment = "dev"
+						targt_environment = "dev"
 						workerType = "Micro"
 						workers = 1						
 					}
 					if(env.TARGET_ENV == "test") {
-						environment = "test"
+						targt_environment = "test"
 						workerType = "Micro"
 						workers = 1						
 					}
 					if(env.TARGET_ENV == "stage") {
-						environment = "stage"
+						targt_environment = "stage"
 						workerType = "Micro"
 						workers = 1						
 					}
 					if(env.TARGET_ENV == "cert") {
-						environment = "cert"
+						targt_environment = "cert"
 						workerType = "Micro"
 						workers = 1						
 					}
 					if(env.TARGET_ENV == "prod") {
-						environment = "prod"
+						targt_environment = "prod"
 						workerType = "Micro"
 						workers = 1						
 					}						
 				}
 				echo "Deploying to CLOUDHUB Starting....."
-				bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=${workerType} -Dworkers=${workers} -Denvironment=${environment}'
+				bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=${workerType} -Dworkers=${workers} -Denvironment=${targt_environment}'
 				echo "Deploying to CLOUDHUB Completed....." 
 			}
 		}

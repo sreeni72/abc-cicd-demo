@@ -4,7 +4,7 @@ pipeline {
 	environment {
 		MULE_CRED = credentials('mule.credentials')
 		NEXUS_CRED = credentials('nexus.credentials')
-		TARGET_ENV = ${Target}
+		TARGET_ENV = "${Target}"
 		BRANCH_NAME = "${GIT_BRANCH.split("/")[1]}"
 		group_id = readMavenPom().getGroupId()
 		artifact_id = readMavenPom().getArtifactId()

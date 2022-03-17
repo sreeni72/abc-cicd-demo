@@ -14,21 +14,22 @@ pipeline {
     		}
     	}
 	stage('Publish to Exchange'){
+		environment {
+			ANYPOINT_CREDENTIALS = credentials(‘anypoint.credentials’)
+		}
 		steps{
 			echo "Publishing to Exchange Starting....."
-			withCredentials([usernamePassword(credentialsId: 'mule.credentials', passwordVariable: 'anypoint_pwd', usernameVariable: 'anypoint_user')]) {
-    				bat 'mvn clean deploy -Dusername=${anypoint_user} -Dpassword=${anypoint_pwd} -s settings.xml'
-    	    		}
-			echo "Publishing to Exchange Completed....."
-			echo "Publishing to Exchange Completed.....${anypoint_user}, ${anypoint_pwd} "
+			bat 'mvn clean deploy -Dusername=${ANYPOINT_CREDENTIALS_USR} -Dpassword=${ANYPOINT_CREDENTIALS_PSW} -s settings.xml'			
 			echo "Publishing to Exchange Completed....."
 		}
 	}
 	stage('Deploy to CLOUDHUB'){
+		environment {
+			ANYPOINT_CREDENTIALS = credentials(‘anypoint.credentials’)
+		}
 		steps{
 			echo "Deploying to CLOUDHUB Starting....."
-			echo "Publishing to Exchange Completed.....${anypoint_user}, ${anypoint_pwd} "
-			bat 'mvn clean deploy -DmuleDeploy -Dusername="%anypoint_user%" -Dpassword="%anypoint_pwd%" -DworkerType=Micro -Dworkers=1 -Denvironment=dev -Dmule.version=4.4.0'
+			bat 'mvn clean deploy -DmuleDeploy -Dusername=${ANYPOINT_CREDENTIALS_USR} -Dpassword=${ANYPOINT_CREDENTIALS_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=dev -Dmule.version=4.4.0'
     	    		echo "Deploying to CLOUDHUB Completed....." 
 		}
 	}

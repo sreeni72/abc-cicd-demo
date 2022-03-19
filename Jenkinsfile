@@ -52,9 +52,9 @@ pipeline {
 			steps{
 				script{
 					if(env.BRANCH_NAME == "develop") {
-						TARGET_ENV="dev"
-						WORKER_TYPE="Micro"
-						NO_OF_WORKERS="1"
+						TARGET_ENV = dev
+						WORKER_TYPE = Micro
+						NO_OF_WORKERS = 1
 					}					 
 					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test"){
 						WORKER_TYPE="Micro"

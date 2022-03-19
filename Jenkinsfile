@@ -75,33 +75,11 @@ pipeline {
 					}	
 					//echo ${TARGET_ENV}
 					echo "env.TARGET_ENV" + TARGET_ENV
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType="${WORKER_TYPE}" -Dworkers="${WORKERS}" -Denvironment=TARGET_ENV'	 				
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=WORKER_TYPE -Dworkers=WORKERS -Denvironment=TARGET_ENV'	 				
 				}		
 			}
 		}
-		stage("Perform Regression Test"){
-		    when { expression { env.BRANCH_NAME != "master" } }
-			steps {
-				script {
-					bat 'npm install -g newman'
-					try{
-						if(env.BRANCH_NAME == "develop")
-							bat 'npm run app-tests-dev' 
-						if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test")
-							bat 'npm run app-tests-test'
-						if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage")
-							bat 'npm run app-tests-stage'
-						if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert")
-							bat 'npm run app-tests-cert'
-						currentBuild.result = 'SUCCESS'
-					}
-					catch(Exception e){
-						currentBuild.result = 'FAILURE'
-					}
-					junit 'newman.xml'
-				}                
-			}
-		}										
+												
 	}
 	
 	post {

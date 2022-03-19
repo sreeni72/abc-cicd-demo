@@ -17,28 +17,32 @@ pipeline {
         NEXUS_PROTOCOL = "http"
         NEXUS_URL = "localhost:8081"
         NEXUS_REPOSITORY = "maven-snapshots"
-         
-        
+                
     }
 	
     stages {
-		stage('Build Application') {
-			
+		stage('Build Application') {			
 			steps {
 				bat 'mvn clean package'
 			}
 		}
-		stage("Perfrom MUnit Test"){
-				steps{
-					bat 'mvn clean test -X'
-				}
-			}
-		stage('Publish to Exchange'){
+		stage('Perfrom MUnit Test'){
+			when { expression { env.BRANCH_NAME == "develop"} }
 			steps{
-				script{
-					if(env.BRANCH_NAME == "develop") 
-						bat 'mvn clean deploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -s settings.xml'												
-				}
+					bat 'mvn clean test -X'
+			}
+		}
+		stage ('Sonar Analysis') {
+			when { expression { env.BRANCH_NAME != "master"} }
+            steps {
+                echo 'Excecuted other than master branch.'
+            }
+		}	
+		stage('Publish to Exchange'){
+			when { expression { env.BRANCH_NAME == "develop"} }
+			steps{
+				echo "publish"
+				//bat 'mvn clean deploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -s mvn-settings.xml'					
 			}
 		}
 		stage('Deploy to CLOUDHUB'){
@@ -60,15 +64,23 @@ pipeline {
                     			
 					if(env.BRANCH_NAME == "master") 
 					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=prod' 				
-				}				
+				}		
 			}
 		}
-		stage("Perform Regression Test"){
+	    stage("Perform Regression Test"){
+		    when { expression { env.BRANCH_NAME != "master" } }
 			steps {
 				script {
 					bat 'npm install -g newman'
 					try{
-						bat 'npm run app-tests-dev' 
+						if(env.BRANCH_NAME == "develop")
+							bat 'npm run app-tests-dev' 
+						if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test")
+							bat 'npm run app-tests-test'
+						if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage")
+							bat 'npm run app-tests-stage'
+						if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert")
+							bat 'npm run app-tests-cert'
 						currentBuild.result = 'SUCCESS'
 					}
 					catch(Exception e){
@@ -77,15 +89,14 @@ pipeline {
 					junit 'newman.xml'
 				}                
 			}
-		}
-    stage ('Clean Workspace') {
-			steps {
-				cleanWs deleteDirs: true, notFailBuild: true
-			}
-		}								
+		}			
+												
 	}
 	
 	post {
+		success {
+			cleanWs deleteDirs: true, notFailBuild: true
+		}
 		failure {
 			cleanWs deleteDirs: true, notFailBuild: true
 		}

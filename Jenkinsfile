@@ -17,10 +17,7 @@ pipeline {
         NEXUS_PROTOCOL = "http"
         NEXUS_URL = "localhost:8081"
         NEXUS_REPOSITORY = "maven-snapshots"
-        
-		//WORKER_TYPE=""
-		//WORKERS=""
-        
+                
     }
 	
     stages {
@@ -51,33 +48,48 @@ pipeline {
 		stage('Deploy to CLOUDHUB'){
 			steps{
 				script{
-					if(env.BRANCH_NAME == "develop") {
-						TARGET_ENV = "dev"
-						WORKER_TYPE = "Micro"
-						NO_OF_WORKERS = 1
-					}					 
-					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test"){
-						WORKER_TYPE="Micro"
-						NO_OF_WORKERS="1"						
-					}					 
-					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage"){
-						WORKER_TYPE="Micro"
-						NO_OF_WORKERS="1"
-					}					 
-					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert"){
-						WORKER_TYPE="Micro"
-						NO_OF_WORKERS="1"
-					}                   			
-					if(env.BRANCH_NAME == "master") {
-						WORKER_TYPE="Micro"
-						NO_OF_WORKERS="1"
-					}	
+					if(env.BRANCH_NAME == "develop") 
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=dev'
+					 
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test")
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=test'
 					
-					echo "env.TARGET_ENV" + TARGET_ENV
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=WORKER_TYPE -Dworkers=1 -Denvironment=TARGET_ENV'	 				
+					 
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage")
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=stage'
+					
+					 
+					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert")
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=cert'
+                    			
+					if(env.BRANCH_NAME == "master") 
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=prod' 				
 				}		
 			}
 		}
+	    stage("Perform Regression Test"){
+		    when { expression { env.BRANCH_NAME != "master" } }
+			steps {
+				script {
+					bat 'npm install -g newman'
+					try{
+						if(env.BRANCH_NAME == "develop")
+							bat 'npm run app-tests-dev' 
+						if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test")
+							bat 'npm run app-tests-test'
+						if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage")
+							bat 'npm run app-tests-stage'
+						if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert")
+							bat 'npm run app-tests-cert'
+						currentBuild.result = 'SUCCESS'
+					}
+					catch(Exception e){
+						currentBuild.result = 'FAILURE'
+					}
+					junit 'newman.xml'
+				}                
+			}
+		}			
 												
 	}
 	

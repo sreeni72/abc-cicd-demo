@@ -18,8 +18,8 @@ pipeline {
         NEXUS_URL = "localhost:8081"
         NEXUS_REPOSITORY = "maven-snapshots"
         
-		WORKER_TYPE=""
-		WORKERS=""
+		//WORKER_TYPE=""
+		//WORKERS=""
         
     }
 	

@@ -44,7 +44,7 @@ pipeline {
 		stage('Publish to Exchange'){
 			when { expression { env.BRANCH_NAME == "develop"} }
 			steps{
-				bat 'mvn clean deploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -s mvn-settings.xml'					
+				//bat 'mvn clean deploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -s mvn-settings.xml'					
 			}
 		}
 		stage('Deploy to CLOUDHUB'){

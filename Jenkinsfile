@@ -54,27 +54,27 @@ pipeline {
 					if(env.BRANCH_NAME == "develop") {
 						TARGET_ENV="dev"
 						WORKER_TYPE="Micro"
-						WORKERS="1"
+						NO_OF_WORKERS="1"
 					}					 
 					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test"){
 						WORKER_TYPE="Micro"
-						WORKERS=1						
+						NO_OF_WORKERS="1"						
 					}					 
 					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage"){
 						WORKER_TYPE="Micro"
-						WORKERS="1"
+						NO_OF_WORKERS="1"
 					}					 
 					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert"){
 						WORKER_TYPE="Micro"
-						WORKERS="1"
+						NO_OF_WORKERS="1"
 					}                   			
 					if(env.BRANCH_NAME == "master") {
 						WORKER_TYPE="Micro"
-						WORKERS="1"
+						NO_OF_WORKERS="1"
 					}	
 					
 					echo "env.TARGET_ENV" + TARGET_ENV
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=WORKER_TYPE -Dworkers=WORKERS -Denvironment=TARGET_ENV'	 				
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=WORKER_TYPE -Dworkers=NO_OF_WORKERS -Denvironment=TARGET_ENV'	 				
 				}		
 			}
 		}

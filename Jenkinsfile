@@ -41,55 +41,145 @@ pipeline {
 		stage('Publish to Exchange'){
 			when { expression { env.BRANCH_NAME == "develop"} }
 			steps{
-				echo "publish"
-				//bat 'mvn clean deploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -s mvn-settings.xml'					
-			}
-		}
-		stage('Deploy to CLOUDHUB'){
-			steps{
-				script{
-					if(env.BRANCH_NAME == "develop") 
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=dev'
-					 
-					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test")
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=test'
-					
-					 
-					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage")
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=stage'
-					
-					 
-					if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert")
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=cert'
-                    			
-					if(env.BRANCH_NAME == "master") 
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=prod' 				
-				}		
-			}
-		}
-	    stage("Perform Regression Test"){
-		    when { expression { env.BRANCH_NAME != "master" } }
-			steps {
 				script {
-					bat 'npm install -g newman'
-					try{
-						if(env.BRANCH_NAME == "develop")
-							bat 'npm run app-tests-dev' 
-						if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "test")
-							bat 'npm run app-tests-test'
-						if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage")
-							bat 'npm run app-tests-stage'
-						if(env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert")
-							bat 'npm run app-tests-cert'
-						currentBuild.result = 'SUCCESS'
-					}
-					catch(Exception e){
-						currentBuild.result = 'FAILURE'
-					}
-					junit 'newman.xml'
-				}                
+				try{
+					bat 'mvn clean deploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -s mvn-settings.xml'		
+					currentBuild.result = 'SUCCESS'
+				}
+				catch(Exception e){
+					currentBuild.result = 'FAILURE'
+				}
+				}
 			}
-		}			
+		}
+		
+		
+		stage("Deploy to CLOUDHUB") {
+            parallel {
+                stage("DEV") {
+                    when { expression { env.BRANCH_NAME == "develop" } }
+                    steps {
+						script {
+						try{
+							bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=dev'
+							currentBuild.result = 'SUCCESS'
+						}
+						catch(Exception e){
+							currentBuild.result = 'FAILURE'
+						}
+						}
+                    }
+                }
+                stage("TEST") {
+                    when { expression { env.BRANCH_NAME == "release" && env.TARGET_ENV == "test" } }
+                    steps {
+					    script {
+						try{
+							bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=test'
+							currentBuild.result = 'SUCCESS'
+						}
+						catch(Exception e){
+							currentBuild.result = 'FAILURE'
+						}
+						}
+                    }
+                }
+                stage("STAGE") {
+                    when { expression { env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage" } }
+                    steps {
+					    script {
+						try{
+                        	bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=stage'
+							currentBuild.result = 'SUCCESS'
+						}
+						catch(Exception e){
+							currentBuild.result = 'FAILURE'
+						}
+						}
+                    }
+                }
+				stage("CERT") {
+                    when { expression { env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert" } }
+                    steps {
+					    script {
+						try{
+							bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=cert'
+							currentBuild.result = 'SUCCESS'
+						}
+						catch(Exception e){
+							currentBuild.result = 'FAILURE'
+						}
+						}
+                    }
+                }
+				stage("PROD") {
+                    when { expression { env.BRANCH_NAME == "master"} }
+                    steps {
+					    script {
+						try{
+							bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=Micro -Dworkers=1 -Denvironment=prod'
+							currentBuild.result = 'SUCCESS'
+						}
+						catch(Exception e){
+							currentBuild.result = 'FAILURE'
+						}
+						}
+                    }
+                }
+            }
+        }
+	    
+
+
+		stage("Perform Integration Test") {
+            parallel {
+                stage("TEST") {
+                    when { expression { env.BRANCH_NAME == "release" && env.TARGET_ENV == "test" } }
+                    steps {
+						script {
+						try{
+							bat 'npm run app-tests-test'
+							currentBuild.result = 'SUCCESS'
+						}
+						catch(Exception e){
+							currentBuild.result = 'FAILURE'
+						}
+						junit 'newman.xml'
+                    }
+					}
+                }
+                stage("STAGE") {
+                    when { expression { env.BRANCH_NAME == "release" && env.TARGET_ENV == "stage" } }
+                    steps {
+					    script {
+                        try{
+							bat 'npm run app-tests-stage'
+							currentBuild.result = 'SUCCESS'
+						}
+						catch(Exception e){
+							currentBuild.result = 'FAILURE'
+						}
+						junit 'newman.xml'
+                    }
+					}
+                }
+                stage("CERT") {
+                    when { expression { env.BRANCH_NAME == "release" && env.TARGET_ENV == "cert" } }
+                    steps {
+					    script {
+                        try{
+							bat 'npm run app-tests-cert'
+							currentBuild.result = 'SUCCESS'
+						}
+						catch(Exception e){
+							currentBuild.result = 'FAILURE'
+						}
+						junit 'newman.xml'
+                    }
+					}
+                }
+            }
+        }
 												
 	}
 	

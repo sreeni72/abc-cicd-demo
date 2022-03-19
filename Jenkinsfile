@@ -74,7 +74,7 @@ pipeline {
 					}	
 					
 					echo "env.TARGET_ENV" + TARGET_ENV
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=WORKER_TYPE -Dworkers=NO_OF_WORKERS -Denvironment=TARGET_ENV'	 				
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType=WORKER_TYPE -Dworkers=1 -Denvironment=TARGET_ENV'	 				
 				}		
 			}
 		}

@@ -71,7 +71,7 @@ pipeline {
 						WORKER_TYPE="Micro"
 						WORKERS=1
 					}			
-					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType="${WORKER_TYPE}" -Dworkers="${WORKERS}" -Denvironment="${TARGET_ENV}"'	 				
+					bat 'mvn clean deploy -DmuleDeploy -Dusername=${MULE_CRED_USR} -Dpassword=${MULE_CRED_PSW} -DworkerType="${WORKER_TYPE}" -Dworkers="${WORKERS}" -Denvironment=env.TARGET_ENV'	 				
 				}		
 			}
 		}

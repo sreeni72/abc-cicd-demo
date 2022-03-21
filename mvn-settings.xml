@@ -9,7 +9,7 @@
 			<password>${password}</password>
 		</server>
 		<server>
-			<id>nexus</id>
+			<id>nexus-repo</id>
 			<username>${username}</username>
 			<password>${password}</password>
 		</server>

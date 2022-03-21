@@ -39,11 +39,19 @@ pipeline {
             }
 		}
 	    stage('deploy-to-nexus') {
-      		steps {
-        		
-        		// use profile nexus (-P nexus) to deploy to Nexus.
-        		bat "mvn clean deploy -P nexus"
-      		}
+		    when { expression { env.BRANCH_NAME == "develop"} }
+			steps{
+				script {
+				try{
+					// use profile nexus (-P nexus) to deploy to Nexus.
+        				bat "mvn clean deploy -P nexus"
+					currentBuild.result = 'SUCCESS'
+				}
+				catch(Exception e){
+					currentBuild.result = 'FAILURE'
+				}
+				}
+			}      		
     		}
 		stage('Publish to Exchange'){
 			when { expression { env.BRANCH_NAME == "develop"} }

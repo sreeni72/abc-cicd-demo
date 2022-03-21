@@ -2,11 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>843708ab-4d59-4d50-ac75-94ecd6bd7be8</groupId>
+	<groupId>706a87d9-32b8-43da-9a9c-7208ea9f2160</groupId>
 	<artifactId>abc-cicd-demo</artifactId>
 	<version>1.0.0</version>
 	<packaging>mule-application</packaging>
- 
+
 	<name>abc-cicd-demo</name>
 
 	<properties>
@@ -38,7 +38,7 @@
 						<applicationName>${project.artifactId}-${environment}</applicationName>
 						<environment>${environment}</environment>
 						<workers>${workers}</workers>
-						<workerType>${worker.type}</workerType>
+						<workerType>${workerType}</workerType>
 						<objectStoreV2>true</objectStoreV2>
 					</cloudHubDeployment>
 					<classifier>mule-application</classifier>
@@ -88,6 +88,23 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
+	
+	<profiles>
+      <profile>
+         <id>nexus</id>
+         <distributionManagement>
+            <repository>
+               <id>nexus-repo</id>
+               <url>http://localhost:9081/repository/maven-releases/</url>
+            </repository>
+            <snapshotRepository>
+               <id>nexus-repo</id>
+               <url>http://localhost:9081/repository/maven-snapshots/</url>
+            </snapshotRepository>
+         </distributionManagement>
+      </profile>
+   </profiles>
+   
 	<distributionManagement>
 		<repository>
 			<uniqueVersion>false</uniqueVersion>
@@ -95,6 +112,6 @@
 			<name>Corporate Repository</name>
 			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/${project.groupId}/maven</url>
 			<layout>default</layout>
-		</repository>
+		</repository>		
 	</distributionManagement>
 </project>

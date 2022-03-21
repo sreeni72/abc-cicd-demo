@@ -3,7 +3,7 @@ pipeline {
      
 	environment {
 		MULE_CRED = credentials('mule.credentials')
-		// NEXUS_CRED = credentials('nexus.credentials')
+		NEXUS_CRED = credentials('nexus.credentials')
 		TARGET_ENV = "${Target}"
 		BRANCH_NAME = "${GIT_BRANCH.split("/")[1]}"
 		//group_id = readMavenPom().getGroupId()
@@ -15,7 +15,7 @@ pipeline {
 	    BUILD_NUMBER = currentBuild.getNumber()
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
-        NEXUS_URL = "localhost:8081"
+        NEXUS_URL = "localhost:9081"
         NEXUS_REPOSITORY = "maven-snapshots"
                 
     }
@@ -37,7 +37,14 @@ pipeline {
             steps {
                 echo 'Excecuted other than master branch.'
             }
-		}	
+		}
+	    stage('deploy-to-nexus') {
+      		steps {
+        		
+        		// use profile nexus (-P nexus) to deploy to Nexus.
+        		bat "mvn clean deploy -P nexus"
+      		}
+    		}
 		stage('Publish to Exchange'){
 			when { expression { env.BRANCH_NAME == "develop"} }
 			steps{

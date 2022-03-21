@@ -8,5 +8,10 @@
 			<username>${username}</username>
 			<password>${password}</password>
 		</server>
+		<server>
+			<id>nexus</id>
+			<username>${username}</username>
+			<password>${password}</password>
+		</server>
 	</servers>
 </settings>

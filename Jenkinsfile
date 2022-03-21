@@ -44,7 +44,7 @@ pipeline {
 				script {
 				try{
 					// use profile nexus (-P nexus) to deploy to Nexus.
-        				bat "mvn clean deploy -P nexus -Dusername=${NEXUS_CRED_USR} -Dpassword=${NEXUS_CRED_PSW} -s mvn-settings.xml"
+        				bat 'mvn clean deploy -P nexus -Dusername=${NEXUS_CRED_USR} -Dpassword=${NEXUS_CRED_PSW} -s mvn-settings.xml'
 					currentBuild.result = 'SUCCESS'
 				}
 				catch(Exception e){
